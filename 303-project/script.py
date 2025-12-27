@@ -4,29 +4,29 @@ import logging
 from flask import Flask, jsonify, request, render_template_string
 from datetime import datetime
 
-# --- CONFIGURATION & LOGGING ---
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
-# OpenWeather API Key
+
 API_KEY = "23005d9ad6a0c145d2cd791af1500b4e"
 BASE_URL = "https://api.openweathermap.org/data/2.5/forecast"
 
 DAYS_TR = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"]
 CITIES = ["Istanbul", "Ankara", "Izmir", "Bursa", "Antalya", "Adana", "Konya", "Gaziantep", "Kayseri", "Trabzon"]
 
-# Backend Cache (15 Dakika)
+
 CACHE = {}
 CACHE_TTL = 900
 
 
-# --- HELPERS ---
+
 def get_weather_data(city):
     now = time.time()
 
-    # Cache kontrolü
+    
     if city in CACHE and (now - CACHE[city]["time"]) < CACHE_TTL:
         return CACHE[city]["data"]
 
@@ -48,7 +48,7 @@ def get_weather_data(city):
     forecast = []
     seen_days = set()
 
-    # API 3 saatlik veriler döner, biz her günün öğle vaktini (12:00) seçiyoruz
+   
     for item in data.get("list", []):
         dt_object = datetime.fromtimestamp(item["dt"])
         day_name = DAYS_TR[dt_object.weekday()]
@@ -71,7 +71,7 @@ def get_weather_data(city):
     return {"error": "Veri işlenemedi."}
 
 
-# --- ROUTES ---
+
 @app.route("/")
 def index():
     return render_template_string(HTML_TEMPLATE, cities=CITIES)
@@ -86,7 +86,7 @@ def api_weather():
     return jsonify(data)
 
 
-# --- FRONTEND (HTML & CSS & JS) ---
+
 HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="tr">
@@ -205,4 +205,5 @@ async function fetchWeather() {
 """
 
 if __name__ == "__main__":
+
     app.run(debug=True)
