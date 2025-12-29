@@ -96,7 +96,7 @@ SADECE JSON DÖN:
 """
 
         response = client.models.generate_content(
-            model="models/gemini-pro",
+            model="gemini-2.0-flash"",
             contents=prompt
         )
 
@@ -519,3 +519,4 @@ def index():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
