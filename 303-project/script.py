@@ -1,4 +1,4 @@
-import json
+port json
 import time
 from datetime import datetime
 
@@ -96,7 +96,7 @@ SADECE JSON DÖN:
 """
 
         response = client.models.generate_content(
-            model="gemini-2.0-flash"",
+            model="gemini-2.0-flash",
             contents=prompt
         )
 
@@ -179,8 +179,35 @@ HTML = """
 <title>AI Stil Asistanı</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-body{margin:0;font-family:'Segoe UI',sans-serif;background:linear-gradient(120deg,#6a7cf7,#7f6ae6);}
-.container{max-width:1500px;margin:30px auto;background:#fff;border-radius:24px;padding:30px;}
+body{
+  margin:0;
+  font-family:'Segoe UI',sans-serif;
+  min-height:100vh;
+  background:
+    radial-gradient(circle at top left, #7f6ae6, transparent 40%),
+    radial-gradient(circle at bottom right, #6a7cf7, transparent 40%),
+    linear-gradient(135deg, #0f172a, #1e293b);
+  background-attachment: fixed;
+}
+
+
+
+.container{
+  max-width:1500px;
+  margin:30px auto;
+  padding:30px;
+
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  border-radius:24px;
+  border:1px solid rgba(255,255,255,0.25);
+  box-shadow:
+    0 20px 50px rgba(0,0,0,0.25),
+    inset 0 1px 0 rgba(255,255,255,0.2);
+}
+
 h1{text-align:center;margin-bottom:20px}
 .controls{display:flex;justify-content:center;gap:12px;margin-bottom:25px;}
 select, button{
@@ -519,4 +546,5 @@ def index():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
 
