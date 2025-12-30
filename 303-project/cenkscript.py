@@ -124,7 +124,7 @@ def get_gemini_suggestion(temp, weather, day, is_sick):
         """
 
         response = client.models.generate_content(
-            model="gemini-3-pro-preview",
+            model="gemini-3-flash-preview",
             contents=prompt
         )
 
