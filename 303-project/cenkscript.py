@@ -84,56 +84,47 @@ def get_gemini_suggestion(temp, weather, day, is_sick):
                 return "Sıcak hava"
 
         prompt = f"""
-Sen profesyonel bir moda stilistisin.
+        KULLANICI:
+        - Stil: {u['style']}
+        - Renk tercihi: {u['colors']}
+        - Bütçe: {u['budget']}
+        - Hasta: {"Evet" if is_sick else "Hayır"}
 
-GÜN: {day}
-HAVA:
-- {temp}°C
-- {weather}
-- {weather_context(temp)}
+        KURALLAR:
+        - Net ve kısa yaz
+        - Ürün kategorilerini ayır
+        - Marka ismi YAZMA
+        - Türkiye iklimine uygun öner
+        - Hastaysa katmanlı giyim öner
 
-KULLANICI:
-- Stil: {u['style']}
-- Renk tercihi: {u['colors']}
-- Bütçe: {u['budget']}
-- Hasta: {"Evet" if is_sick else "Hayır"}
-
-KURALLAR:
-- Net ve kısa yaz
-- Ürün kategorilerini ayır
-- Marka ismi YAZMA
-- Türkiye iklimine uygun öner
-- Hastaysa katmanlı giyim öner
-
-SADECE JSON DÖN:
-{
-  "secenek1": {
-    "ust": "",
-    "alt": "",
-    "ayakkabi": "",
-    "dis_giyim": "",
-    "aksesuar": ""
-  },
-  "secenek2": {
-    "ust": "",
-    "alt": "",
-    "ayakkabi": "",
-    "dis_giyim": "",
-    "aksesuar": ""
-  },
-  "secenek3": {
-    "ust": "",
-    "alt": "",
-    "ayakkabi": "",
-    "dis_giyim": "",
-    "aksesuar": ""
-  }
-}
-
-"""
+        SADECE JSON DÖN:
+        {{
+          "secenek1": {{
+            "ust": "",
+            "alt": "",
+            "ayakkabi": "",
+            "dis_giyim": "",
+            "aksesuar": ""
+          }},
+          "secenek2": {{
+            "ust": "",
+            "alt": "",
+            "ayakkabi": "",
+            "dis_giyim": "",
+            "aksesuar": ""
+          }},
+          "secenek3": {{
+            "ust": "",
+            "alt": "",
+            "ayakkabi": "",
+            "dis_giyim": "",
+            "aksesuar": ""
+          }}
+        }}
+        """
 
         response = client.models.generate_content(
-            model="gemini-2.0-flash",
+            model="gemini-3-pro-preview",
             contents=prompt
         )
 

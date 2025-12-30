@@ -4,12 +4,12 @@ from flask import Flask, jsonify, request, render_template_string
 from datetime import datetime
 from google import  genai
 from google.genai import types
-
+import os
 app = Flask(__name__)
 
 # --- AYARLAR ---
 WEATHER_API_KEY = "23005d9ad6a0c145d2cd791af1500b4e"
-GEMINI_API_KEY = "AIzaSyCqy3dp3yjAsItzJh1ttbOklAU8H0oTZeg"
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 DAYS_TR = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"]
 CITIES = ["Istanbul", "Ankara", "Izmir", "Bursa", "Antalya", "Adana", "Konya", "Gaziantep", "Kayseri", "Trabzon"]
