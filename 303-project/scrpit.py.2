@@ -172,7 +172,7 @@ USERS = {
     "alperen": {
         "style": "spor",
         "colors": "koyu renkler",
-        "budget": "orta"
+
     }
 }
 CURRENT_USER = "alperen"
@@ -250,7 +250,7 @@ def get_gemini_suggestion(temp, weather, day, is_sick):
     HAVA: {temp}°C, {weather}
     STİL: {u['style']}
     RENK: {u['colors']}
-    BÜTÇE: {u['budget']}
+    
     HASTA: {"Evet" if is_sick else "Hayır"}
 
     SADECE JSON DÖN.
@@ -325,14 +325,14 @@ st.sidebar.title("👤 Stil Profili")
 
 style = st.sidebar.selectbox("Stil", ["spor","klasik","oversize"])
 colors = st.sidebar.selectbox("Renk", ["açık renkler","koyu renkler"])
-budget = st.sidebar.selectbox("Bütçe", ["düşük","orta","yüksek"])
+
 hasta = st.sidebar.checkbox("🤧 Hastayım")
 
 if st.sidebar.button("💾 Profil Kaydet"):
     USERS[CURRENT_USER].update({
         "style": style,
         "colors": colors,
-        "budget": budget
+        
     })
     st.sidebar.success("Profil kaydedildi")
 
