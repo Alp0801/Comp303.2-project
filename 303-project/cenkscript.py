@@ -12,9 +12,9 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-# =====================================================
+
 # AYARLAR
-# =====================================================
+
 
 st.set_page_config(page_title="AI Stil Asistanı", layout="wide")
 st.markdown("""
@@ -172,14 +172,14 @@ USERS = {
     "alperen": {
         "style": "spor",
         "colors": "koyu renkler",
-        "budget": "orta"
+        
     }
 }
 CURRENT_USER = "alperen"
 
-# =====================================================
+
 # DATABASE (SQLite)
-# =====================================================
+
 
 Base = declarative_base()
 engine = create_engine("sqlite:///favorites.db", echo=False)
@@ -218,9 +218,9 @@ def delete_favorite(fav_id: int) -> bool:
     db.commit()
     return True
 
-# =====================================================
+
 # WEATHER
-# =====================================================
+
 
 def get_weather(city):
     now = time.time()
@@ -247,9 +247,9 @@ def get_weather(city):
     CACHE[city] = {"time": now, "data": forecast}
     return forecast
 
-# =====================================================
+
 # GEMINI
-# =====================================================
+
 
 def get_gemini_suggestion(temp, weather, day, is_sick):
     client = genai.Client(api_key=GEMINI_API_KEY)
@@ -262,7 +262,7 @@ def get_gemini_suggestion(temp, weather, day, is_sick):
     HAVA: {temp}°C, {weather}
     STİL: {u['style']}
     RENK: {u['colors']}
-    BÜTÇE: {u['budget']}
+    
     HASTA: {"Evet" if is_sick else "Hayır"}
 
     SADECE JSON DÖN.
@@ -332,28 +332,28 @@ def select_day(day_data):
     # yeni gün seçildi, tekrar üretmeye hazır
     st.session_state["need_generate"] = True
 
-# =====================================================
+
 # SIDEBAR (PROFİL)
-# =====================================================
+
 
 st.sidebar.title("👤 Stil Profili")
 
 style = st.sidebar.selectbox("Stil", ["spor","klasik","oversize"])
 colors = st.sidebar.selectbox("Renk", ["açık renkler","koyu renkler"])
-budget = st.sidebar.selectbox("Bütçe", ["düşük","orta","yüksek"])
+
 hasta = st.sidebar.checkbox("🤧 Hastayım")
 
 if st.sidebar.button("💾 Profil Kaydet"):
     USERS[CURRENT_USER].update({
         "style": style,
         "colors": colors,
-        "budget": budget
+        
     })
     st.sidebar.success("Profil kaydedildi")
 
-# =====================================================
+
 # MAIN UI
-# =====================================================
+
 
 st.title("🌤️ AI Stil Asistanı")
 
@@ -362,9 +362,9 @@ city = st.selectbox("📍 Şehir Seç", CITIES)
 if st.button("🌦️ Hava Durumunu Göster"):
     st.session_state["weather"] = get_weather(city)
 
-# =====================================================
+
 # WEATHER CARDS
-# =====================================================
+
 
 if "weather" in st.session_state:
     cols = st.columns(len(st.session_state["weather"]))
@@ -406,9 +406,8 @@ if "weather" in st.session_state:
             ):
                 pass
 
-# =====================================================
+
 # AI KOMBIN
-# =====================================================
 
 if "selected_day" in st.session_state:
     d = st.session_state["selected_day"]
@@ -422,9 +421,9 @@ if "selected_day" in st.session_state:
 
         st.session_state["need_generate"] = False
 
-# =====================================================
+
 # TABS
-# =====================================================
+
 
 if "kombin" in st.session_state:
     tabs = st.tabs(["Seçenek 1","Seçenek 2","Seçenek 3"])
@@ -468,9 +467,9 @@ if "kombin" in st.session_state:
                 db.commit()
                 st.success("Favoriye eklendi")
 
-# =====================================================
+
 # FAVORİLER
-# =====================================================
+
 
 st.subheader("📌 Favoriler")
 
