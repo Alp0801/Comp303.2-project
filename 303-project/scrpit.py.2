@@ -253,11 +253,38 @@ def get_gemini_suggestion(temp, weather, day, is_sick):
     BÜTÇE: {u['budget']}
     HASTA: {"Evet" if is_sick else "Hayır"}
 
-    SADECE JSON DÖN:
+    SADECE JSON DÖN.
+    HTML, <h3>, <p>, emoji veya markdown KULLANMA.
+    SADECE DÜZ METİN yaz.
+
     {{
-      "secenek1": {{"ust":"","alt":"","ayakkabi":"","dis_giyim":"","aksesuar":""}},
-      "secenek2": {{"ust":"","alt":"","ayakkabi":"","dis_giyim":"","aksesuar":""}},
-      "secenek3": {{"ust":"","alt":"","ayakkabi":"","dis_giyim":"","aksesuar":""}}
+      "secenek1": {{
+        "ust": "",
+        "alt": "",
+        "ayakkabi": "",
+        "dis_giyim": "",
+        "aksesuar": "",
+        "aciklama": "",
+        "puan": 0
+      }},
+      "secenek2": {{
+        "ust": "",
+        "alt": "",
+        "ayakkabi": "",
+        "dis_giyim": "",
+        "aksesuar": "",
+        "aciklama": "",
+        "puan": 0
+      }},
+      "secenek3": {{
+        "ust": "",
+        "alt": "",
+        "ayakkabi": "",
+        "dis_giyim": "",
+        "aksesuar": "",
+        "aciklama": "",
+        "puan": 0
+      }}
     }}
     """
 
@@ -275,6 +302,12 @@ def get_gemini_suggestion(temp, weather, day, is_sick):
     except Exception:
         st.error("🤖 AI yanıtı okunamadı, tekrar dene")
         return None
+
+
+def render_item(icon, title, value):
+    if value and value.strip():
+        return f"<h3>{icon} {title}</h3><p>{value}</p>"
+    return ""
 
 
 def select_day(day_data):
@@ -379,29 +412,28 @@ if "kombin" in st.session_state:
 
     for i, tab in enumerate(tabs, start=1):
         with tab:
+            if hasta:
+                st.markdown("🤒 **Konfor öncelikli kombin**")
+
             k = st.session_state["kombin"][f"secenek{i}"]
 
             st.markdown(
                 f"""
                 <div class="weather-card" style="margin-bottom:20px">
-                    <h3>👕 Üst</h3>
-                    <p>{k["ust"]}</p>
+                    {render_item("👕", "Üst", k["ust"])}
+                    {render_item("👖", "Alt", k["alt"])}
+                    {render_item("👟", "Ayakkabı", k["ayakkabi"])}
+                    {render_item("🧥", "Dış Giyim", k["dis_giyim"])}
+                    {render_item("🕶️", "Aksesuar", k["aksesuar"])}
+                    {f"<p style='opacity:.8'>💡 {k['aciklama']}</p>" if k.get("aciklama") else ""}
 
-                    <h3>👖 Alt</h3>
-                    <p>{k["alt"]}</p>
-
-                    <h3>👟 Ayakkabı</h3>
-                    <p>{k["ayakkabi"]}</p>
-
-                    <h3>🧥 Dış Giyim</h3>
-                    <p>{k["dis_giyim"]}</p>
-
-                    <h3>🕶️ Aksesuar</h3>
-                    <p>{k["aksesuar"]}</p>
                 </div>
                 """,
                 unsafe_allow_html=True
             )
+            if k.get("puan"):
+                st.progress(k["puan"] / 10)
+                st.caption(f"⭐ Uyumluluk Puanı: {k['puan']}/10")
 
             if st.button("⭐ Favoriye Kaydet", key=f"fav{i}"):
                 fav = FavoriteOutfit(
