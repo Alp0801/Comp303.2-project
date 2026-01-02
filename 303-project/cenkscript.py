@@ -201,20 +201,22 @@ class FavoriteOutfit(Base):
     ayakkabi = Column(String)
     dis_giyim = Column(String)
     aksesuar = Column(String)
+    aciklama = Column(String)
+    puan = Column(Integer)
 
     created_at = Column(DateTime, default=datetime.utcnow)
 
-def delete_favorite(fav_id: int):
-    #DBden favori silme func
+Base.metadata.create_all(engine)
+
+
+def delete_favorite(fav_id: int) -> bool:
+    "DBDEN Favori Silme FuNC"
     fav = db.query(FavoriteOutfit).filter(FavoriteOutfit.id == fav_id).first()
     if fav is None:
         return False
-
     db.delete(fav)
     db.commit()
     return True
-
-Base.metadata.create_all(engine)
 
 # =====================================================
 # WEATHER
@@ -263,11 +265,38 @@ def get_gemini_suggestion(temp, weather, day, is_sick):
     BÜTÇE: {u['budget']}
     HASTA: {"Evet" if is_sick else "Hayır"}
 
-    SADECE JSON DÖN:
+    SADECE JSON DÖN.
+    HTML, <h3>, <p>, emoji veya markdown KULLANMA.
+    SADECE DÜZ METİN yaz.
+
     {{
-      "secenek1": {{"ust":"","alt":"","ayakkabi":"","dis_giyim":"","aksesuar":""}},
-      "secenek2": {{"ust":"","alt":"","ayakkabi":"","dis_giyim":"","aksesuar":""}},
-      "secenek3": {{"ust":"","alt":"","ayakkabi":"","dis_giyim":"","aksesuar":""}}
+      "secenek1": {{
+        "ust": "",
+        "alt": "",
+        "ayakkabi": "",
+        "dis_giyim": "",
+        "aksesuar": "",
+        "aciklama": "",
+        "puan": 0
+      }},
+      "secenek2": {{
+        "ust": "",
+        "alt": "",
+        "ayakkabi": "",
+        "dis_giyim": "",
+        "aksesuar": "",
+        "aciklama": "",
+        "puan": 0
+      }},
+      "secenek3": {{
+        "ust": "",
+        "alt": "",
+        "ayakkabi": "",
+        "dis_giyim": "",
+        "aksesuar": "",
+        "aciklama": "",
+        "puan": 0
+      }}
     }}
     """
 
@@ -285,6 +314,12 @@ def get_gemini_suggestion(temp, weather, day, is_sick):
     except Exception:
         st.error("🤖 AI yanıtı okunamadı, tekrar dene")
         return None
+
+
+def render_item(icon, title, value):
+    if value and value.strip():
+        return f"<h3>{icon} {title}</h3><p>{value}</p>"
+    return ""
 
 
 def select_day(day_data):
@@ -389,29 +424,28 @@ if "kombin" in st.session_state:
 
     for i, tab in enumerate(tabs, start=1):
         with tab:
+            if hasta:
+                st.markdown("🤒 **Konfor öncelikli kombin**")
+
             k = st.session_state["kombin"][f"secenek{i}"]
 
             st.markdown(
                 f"""
                 <div class="weather-card" style="margin-bottom:20px">
-                    <h3>👕 Üst</h3>
-                    <p>{k["ust"]}</p>
+                    {render_item("👕", "Üst", k["ust"])}
+                    {render_item("👖", "Alt", k["alt"])}
+                    {render_item("👟", "Ayakkabı", k["ayakkabi"])}
+                    {render_item("🧥", "Dış Giyim", k["dis_giyim"])}
+                    {render_item("🕶️", "Aksesuar", k["aksesuar"])}
+                    {f"<p style='opacity:.8'>💡 {k['aciklama']}</p>" if k.get("aciklama") else ""}
 
-                    <h3>👖 Alt</h3>
-                    <p>{k["alt"]}</p>
-
-                    <h3>👟 Ayakkabı</h3>
-                    <p>{k["ayakkabi"]}</p>
-
-                    <h3>🧥 Dış Giyim</h3>
-                    <p>{k["dis_giyim"]}</p>
-
-                    <h3>🕶️ Aksesuar</h3>
-                    <p>{k["aksesuar"]}</p>
                 </div>
                 """,
                 unsafe_allow_html=True
             )
+            if k.get("puan"):
+                st.progress(k["puan"] / 10)
+                st.caption(f"⭐ Uyumluluk Puanı: {k['puan']}/10")
 
             if st.button("⭐ Favoriye Kaydet", key=f"fav{i}"):
                 fav = FavoriteOutfit(
@@ -433,28 +467,29 @@ if "kombin" in st.session_state:
 
 st.subheader("📌 Favoriler")
 
-favorites = db.query(FavoriteOutfit)\
-              .order_by(FavoriteOutfit.created_at.desc())\
-              .all()
+favorites = db.query(FavoriteOutfit).order_by(FavoriteOutfit.created_at.desc()).all()
 
 if len(favorites) == 0:
     st.info("Henüz favori yok.")
 else:
     for f in favorites:
-        col_left, col_right = st.columns([8, 2])
+        left, right = st.columns([8, 2])
 
-        with col_left:
+        with left:
             st.markdown(
                 f"""
                 **{f.city} - {f.day}** ({f.temp}°C, {f.weather}) {"🤧" if f.sick else ""}  
                 🧾 Seçenek: {f.option_number}  
                 👕 {f.ust} | 👖 {f.alt} | 👟 {f.ayakkabi} | 🧥 {f.dis_giyim} | 🕶️ {f.aksesuar}  
+                {f"💡 {f.aciklama}<br>" if f.aciklama else ""}
+                {f"⭐ Puan: {f.puan}/10" if f.puan else ""}
                 <small>{f.created_at}</small>
                 """,
                 unsafe_allow_html=True
             )
 
-        with col_right:
+        with right:
+
             if st.button("🗑️ Sil", key=f"del_{f.id}"):
                 ok = delete_favorite(f.id)
                 if ok:
@@ -462,3 +497,4 @@ else:
                     st.rerun()
                 else:
                     st.error("Silinecek favori bulunamadı ❌")
+
