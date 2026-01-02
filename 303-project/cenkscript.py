@@ -329,6 +329,9 @@ def select_day(day_data):
     if "kombin" in st.session_state:
         del st.session_state["kombin"]
 
+    # yeni gün seçildi, tekrar üretmeye hazır
+    st.session_state["need_generate"] = True
+
 # =====================================================
 # SIDEBAR (PROFİL)
 # =====================================================
@@ -410,10 +413,14 @@ if "weather" in st.session_state:
 if "selected_day" in st.session_state:
     d = st.session_state["selected_day"]
 
-    with st.spinner("🤖 Yapay zeka kombin hazırlıyor..."):
-        st.session_state["kombin"] = get_gemini_suggestion(
-            d["temp"], d["weather"], d["day"], hasta
-        )
+
+    if st.session_state.get("need_generate", False):
+        with st.spinner("🤖 Yapay zeka kombin hazırlıyor..."):
+            st.session_state["kombin"] = get_gemini_suggestion(
+                d["temp"], d["weather"], d["day"], hasta
+            )
+
+        st.session_state["need_generate"] = False
 
 # =====================================================
 # TABS
